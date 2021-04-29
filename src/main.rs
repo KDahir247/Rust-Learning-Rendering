@@ -1,97 +1,110 @@
-use glium;
-use glium::backend::glutin::glutin::event::{Event, WindowEvent};
-use glium::{Surface, implement_vertex};
-
 use util;
+use glium::backend::glutin::glutin::event::{Event, WindowEvent};
+use glium::{Surface};
+
 fn main() {
-    use glium::glutin;
 
     println!("SuperLuminal Performance Enabled: {}", superluminal_perf::enabled());
-
     // Set name of current thread for superluminal profiler
     superluminal_perf::set_current_thread_name("Main Thread");
 
-    superluminal_perf::begin_event("Initialization OpenGL");
-    let mut event_loop = glutin::event_loop::EventLoop::new();
-    let wb = glutin::window::WindowBuilder::new()
-        .with_title("Drawing Triangle");
-    let cb = glutin::ContextBuilder::new()
-        .with_hardware_acceleration(Some(true));
+    //specify the "custom" elapsed time.
+    let mut elapsed_time: f32 = 0.;
+
+
+    superluminal_perf::begin_event("Initialization_OpenGL");
+
+    let mut event_loop = glium::glutin::event_loop::EventLoop::new();
+    let wb = glium::glutin::window::WindowBuilder::new()
+        .with_title("Moving Triangle");
+    let cb = glium::glutin::ContextBuilder::new()
+        .with_hardware_acceleration(Option::from(true));
 
     let mut display = glium::Display::new(wb,cb,&event_loop)
-        .expect("failed to create OpenGL Display");
+        .expect("Failed to create display");
 
     superluminal_perf::end_event();
 
 
-    superluminal_perf::begin_event("setup_triangle_draw");
+    superluminal_perf::begin_event("creating_vertices");
+    //creating vertex buffer
+    util::vertex::initialization_vertex();
 
-    #[derive(Copy, Clone)]
-    struct Vertex {
-        position : [f32;2]
-    }
+    let vertex1 = util::vertex::Vertex::new(-0.5, 0.25);
+    let vertex2 = util::vertex::Vertex::new(0.5, -0.5);
+    let vertex3 = util::vertex::Vertex::new(0., 0.5);
 
-    implement_vertex!(Vertex, position);
+    let shapes = vec![vertex1, vertex2, vertex3];
 
-    let vertex1 = Vertex{ position: [-0.5, -0.5] };
-    let vertex2 = Vertex{ position:[0.0, 0.5]};
-    let vertex3 = Vertex{ position: [0.5, -0.25]};
-    let shape = vec![vertex1, vertex2, vertex3];
+    superluminal_perf::end_event();
 
-    let vertex_buffer = glium::VertexBuffer::new(&display, &shape)
+    superluminal_perf::begin_event("creating_indices_and_vert_buff");
+
+    let vertex_buffer = glium::VertexBuffer::new(&display, &shapes)
         .unwrap();
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
 
-    let vertex_shader = util::read_shader("shader/triangle/triangle.vert")
-        .expect("Failed to read vertex shader");
-
-    let fragment_shader  = util::read_shader("shader/triangle/triangle.frag")
-        .expect("Failed to read fragment shader");
-
-
-    let program =
-        glium::Program::from_source(&display,vertex_shader.as_str(), fragment_shader.as_str(), None)
-            .unwrap();
-
     superluminal_perf::end_event();
 
 
-    event_loop.run(move|evt,_, control_flow|{
+    superluminal_perf::begin_event("loading_shaders");
 
-        superluminal_perf::begin_event("clear_color");
+    let vertex_shader = util::shader::read_shader("shader/moving-triangle/moving-triangle.vert")
+        .expect("Failed to parse or locate vertex shader");
+
+
+    let fragment_shader = util::shader::read_shader("shader/moving-triangle/moving-triangle.frag")
+        .expect("Failed to parse or locate fragment shader");
+
+    superluminal_perf::end_event();
+
+    superluminal_perf::begin_event("creating_program");
+
+    let program = glium::Program::from_source(&display, vertex_shader.as_str(), fragment_shader.as_str(), None)
+        .unwrap();
+
+    superluminal_perf::end_event();
+
+    event_loop.run(move |evt, _,  control_flow| {
+
+        superluminal_perf::begin_event("lerp_ping_pong");
+
+        let t = util::math::lerp(-0.5, 0.5, util::math::ping_pong(elapsed_time, 1.0));
+        elapsed_time += 0.0007;
+
+        superluminal_perf::end_event();
+
+
+        superluminal_perf::begin_event("draw_call");
 
         let mut frame = display.draw();
-        frame.clear_color(0.5,0.2,0.1,1.0);
-
-        frame.draw(&vertex_buffer, &indices, &program, &glium::uniforms::EmptyUniforms, &Default::default())
-            .unwrap();
-
+        frame.clear_color(0.3,0.1,0.2, 1.0);
+        frame.draw(&vertex_buffer, &indices, &program, &glium::uniform! {t: t}, &Default::default());
         frame.finish();
 
         superluminal_perf::end_event();
 
-        superluminal_perf::begin_event("window_handle");
+        let next_frame_time  = std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
 
-        let next_frame_time = std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
+        superluminal_perf::begin_event("window_event_handle");
 
-        *control_flow = glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
+        *control_flow = glium::glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
 
         match evt{
             Event::WindowEvent {event, .. } => {
 
                 match event{
                     WindowEvent::CloseRequested => {
-
-                        *control_flow = glutin::event_loop::ControlFlow::Exit;
+                        *control_flow = glium::glutin::event_loop::ControlFlow::Exit;
                     }
                     _ =>{}
                 }
             }
-
-            _ => {}
+            _ =>{}
         }
 
         superluminal_perf::end_event();
+
     });
 }
 

@@ -19,10 +19,14 @@ opt-level = 3
 
 [lib]
 name = "util"
-path = "util/src/lib.rs"
+path = "util-lib/src/lib.rs"
 
 
 
 [[example]]
 name = "clear-color"
 path = "examples/clear-color/main.rs"
+
+[[example]]
+name = "hello-triangle"
+path = "examples/hello-triangle/main.rs"
