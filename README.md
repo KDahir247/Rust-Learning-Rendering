@@ -7,3 +7,9 @@ Hello_triangle
 <br/>
 
 ![title](https://github.com/KDahir247/Rust-Learning-Rendering/blob/main/pic/hello_triangle.png)
+
+<br/>
+
+Hello_triangle moving (gif quality drop)
+![me](https://github.com/KDahir247/Rust-Learning-Rendering/blob/main/pic/hello_triangle_pingpong.gif)
+
