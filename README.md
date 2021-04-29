@@ -5,7 +5,7 @@ use
 ```
 cargo test
 ```
-to test the rust doc test in util-test
+in the terminal to test the rust doc test in util-test
 <br/>
 <br/>
 use
@@ -15,7 +15,7 @@ cargo run -- --example folder-in-example
 //example
 cargo run -- --example hello-triangle
 ```
-to test the previous examples
+in the terminal to test the previous examples
 
 Eventually I would love to learn low level api such as WGPU or GFX 
 <br/>
