@@ -1,5 +1,23 @@
 # Rust-Learning-Rendering
-learning how to use crate such as glium to utialize OpenGL in rust lang. Eventually i would love to learn low level api such as WGPU or GFX 
+learning how to use crate such as glium to utialize OpenGL in rust lang.
+
+use 
+```
+cargo test
+```
+to test the rust doc test in util-test
+<br/>
+<br/>
+use
+```
+cargo run -- --example folder-in-example
+
+//example
+cargo run -- --example hello-triangle
+```
+to test the previous examples
+
+Eventually I would love to learn low level api such as WGPU or GFX 
 <br/>
 
 <br/>
