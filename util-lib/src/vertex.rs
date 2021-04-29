@@ -1,4 +1,4 @@
-//Need to include Doc
+//reminder: need to include documentation when adding new features
 /// # Initialization the vertex shader.
 /// specify that the Vertex parameters is called position, and the Vertex data will be the Vertex struct which is located in this file
 /// <br/>
