@@ -8,7 +8,7 @@ edition = "2018"
 [dependencies]
 glium = "*"
 superluminal-perf = "*"
-
+image = "*"
 
 
 [profile.release]
@@ -30,3 +30,12 @@ path = "examples/clear-color/main.rs"
 [[example]]
 name = "hello-triangle"
 path = "examples/hello-triangle/main.rs"
+
+[[example]]
+name = "hello-traingle-translation"
+path = "examples/hello-traingle-translation/main.rs"
+
+
+[[example]]
+name ="hello-triangle-matrix"
+path = "examples/hello-triangle-matrix-translation/main.rs"
