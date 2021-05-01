@@ -30,11 +30,11 @@ fn main() {
 
     let absolute_path_to_image = util::core::get_relative_path_file("/image/Deku.png").unwrap();
 
-    let image = image::open(&std::path::Path::new(absolute_path_to_image.as_str())).unwrap().to_bgr8();
+    let image = image::open(&std::path::Path::new(absolute_path_to_image.as_str())).unwrap().to_rgba16();
 
     let image_dimensions = image.dimensions();
 
-    let image = glium::texture::RawImage2d::from_raw_rgb(image.into_raw(), image_dimensions);
+    let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
 
     let texture = glium::texture::Texture2d::new(&display, image)
         .unwrap();
