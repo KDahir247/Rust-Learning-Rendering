@@ -1,0 +1,55 @@
+# Blender MTL File: 'None'
+# Material Count: 4
+
+newmtl MI_CNS1100_DamonDragon_Body
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Body_Nrm.png
+map_Kd C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Body_Col.png
+map_Ns C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Body_Rgh.png
+refl C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Body_Mtl.png
+
+newmtl MI_CNS1100_DamonDragon_Glass
+Ns 589.165294
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.095455
+illum 9
+
+newmtl MI_CNS1100_DamonDragon_Props
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Props_Nrm.png
+map_Kd C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Props_Col.png
+map_Ns C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Props_Rgh.png
+map_d C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Props_Col.png
+refl C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Props_Mtl.png
+
+newmtl MI_CNS1100_DamonDragon_Wings
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Wings_Nrm.png
+map_Kd C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Wings_Col.png
+map_Ns C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Wings_Rgh.png
+map_d C:\\Users\\kdahi\\OneDrive\\Documents\\Rust\\glium\\getting_started\\model\\SRT_Damon\\Textures\\T_CNS1100_DamonDragon_Wings_Col.png

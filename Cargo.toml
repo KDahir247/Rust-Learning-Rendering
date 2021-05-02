@@ -6,10 +6,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-glium = "*"
-superluminal-perf = "*"
-image = "*"
-
+glium = "*" # opengl binding
+superluminal-perf = "*" #profile
+image = "*" # image/texture loading
+tobj = "*" # object loading
 
 [profile.release]
 lto = true
@@ -32,10 +32,15 @@ name = "hello-triangle"
 path = "examples/hello-triangle/main.rs"
 
 [[example]]
-name = "hello-traingle-translation"
-path = "examples/hello-traingle-translation/main.rs"
+name = "hello-triangle-translation"
+path = "examples/hello-triangle-translation/main.rs"
 
 
 [[example]]
 name ="hello-triangle-matrix"
 path = "examples/hello-triangle-matrix-translation/main.rs"
+
+
+[[example]]
+name = "hello-triangle-texture"
+path = "examples/hello-triangle-texture/main.rs"

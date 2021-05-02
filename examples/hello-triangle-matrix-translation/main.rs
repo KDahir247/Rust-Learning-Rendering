@@ -30,11 +30,9 @@ fn main() {
 
     util::vertex::initialization_vertex();
 
-    util::vert!([0., 0.5]);
-
-    let vertex1 = util::vert!([-0.5,-0.5]);
-    let vertex2 = util::vert!([0.5, -0.5]);
-    let vertex3 = util::vert!([0., 0.5]);
+    let vertex1 = util::vert!([-0.5,-0.5 ,0.0]);
+    let vertex2 = util::vert!([0.5, -0.5, 0.0]);
+    let vertex3 = util::vert!([0.0, 0.5, 0.0]);
 
 
     let triangle = vec![vertex1, vertex2, vertex3];
