@@ -61,13 +61,29 @@ fn main() {
         [0.0, 0.0, 0.0, 1.0f32]
     ];
 
+    let light = [1.0, 0.4, 0.9f32];
+
     event_loop.run(move |evt, _, control_flow|{
+
+        superluminal_perf::begin_event("depth_test");
+
+        let params = glium::DrawParameters{
+            depth: glium::Depth{
+                test: glium::DepthTest::IfLess,
+                write: true,
+                ..Default::default()
+            },
+
+            ..Default::default()
+        };
+
+        superluminal_perf::end_event();
 
         superluminal_perf::begin_event("draw_call");
 
         let mut frame = display.draw();
-        frame.clear_color(0.3, 0.2, 0.1, 1.0);
-        frame.draw(&vertex_buffer, &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList), &program,&glium::uniform! {matrix : matrix}, &Default::default()).unwrap();
+        frame.clear_color_and_depth((0.3, 0.2, 0.1, 1.0), 1.0);
+        frame.draw(&vertex_buffer, &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList), &program,&glium::uniform! {matrix : matrix, u_light: light}, &params).unwrap();
         frame.finish();
 
         superluminal_perf::end_event();
