@@ -1,3 +1,4 @@
+
 //reminder: need to include documentation when adding new features
 /// # Retrieve the absolute path for the specified file relative to the current directory.
 ///
@@ -45,7 +46,22 @@ pub fn get_relative_path_file(file: &str) -> Option<String>{
         Ok(_) => { Some(relative_path) }
         Err(_) => { return None; }
     }
+}
 
+/// # Retrieve the absolute folder path within this project directory
+///
+/// return the absolute folder path
+///
+/// similar to `get_relative_path_file(file_path : &str)`, but does not return a specific file in the path just the folder path.
+/// It does not check if the folder exists it just returns the path to the "folder"
+pub fn get_relative_path(folder : &str) -> String{
+    let current_directory = env!("CARGO_MANIFEST_DIR")
+        .parse::<String>()
+        .expect("parsing failed : CARGO_MANIFEST_DIR failed to parse!!");
+
+    let relative_path = format!("{}/{}", current_directory, folder);
+
+    relative_path
 }
 
 /// # Parses WaveFront Obj files and return a list of detailed parameters for the model. such as positions, normals, specular, shininess, texture_detail (diffuse, ambient, normal, etc...)
@@ -66,7 +82,7 @@ pub fn get_relative_path_file(file: &str) -> Option<String>{
 ///     .with_depth_buffer(24);
 /// let display = glium::Display::new(wb, cb, &event_loop)
 ///     .expect("failed to create opengl display");
-/// let valid = util::core::load_wavefront_obj(&display, "model/SRT_Damon/dragon.obj", true);
+/// let valid = util::core::load_wavefront_obj(&display, std::path::Path::new("model/RubyRose/untitled.obj"), true);
 ///
 /// ```
 /// ## Ex 2. A invalid obj to VertexBuffer conversion
@@ -82,17 +98,24 @@ pub fn get_relative_path_file(file: &str) -> Option<String>{
 /// let display = glium::Display::new(wb, cb, &event_loop)
 ///     .expect("failed to create opengl display");
 ///
-/// let invalid = util::core::load_wavefront_obj(&display, "model/invalid.obj", true);
+/// let invalid = util::core::load_wavefront_obj(&display, std::path::Path::new( "model/invalid.obj"), true);
 ///
 /// ```
-pub fn load_wavefront_obj(display : &glium::Display, path : &str, triangulate_face: bool) -> (glium::vertex::VertexBufferAny){
+pub fn load_wavefront_obj(display : &glium::Display, path : &std::path::Path, triangulate_face: bool) -> Vec<super::model::Model> {
 
     let mut vertex_data = Vec::new();
-    match tobj::load_obj(path, triangulate_face){
-        Ok((models, material)) => {
-            for model in &models {
+    let mut texture_data = Vec::default();
+    let mut material_data = Vec::default();
+    let mut model_container  = Vec::new();
+    let mut vertex_buffer_any_array= Vec::new();
 
+    match tobj::load_obj(path, triangulate_face) {
+        Ok((models, material)) => {
+
+            for model in &models {
                 let mesh = &model.mesh;
+
+                vertex_data.clear();
 
                 for index in &mesh.indices {
                     let i = *index as usize;
@@ -104,28 +127,72 @@ pub fn load_wavefront_obj(display : &glium::Display, path : &str, triangulate_fa
                         mesh.positions[3 * i + 2]
                     ];
 
-                    let normal = if !mesh.normals.is_empty(){
+                    let normal = if !mesh.normals.is_empty() {
                         [
                             mesh.normals[3 * i],
                             mesh.normals[3 * i + 1],
                             mesh.normals[3 * i + 2]
                         ]
-                    }else{
+                    } else {
                         [0.0, 0.0, 0.0]
                     };
 
-                    //More features will be added when needed.
 
+                    let tex_coords = if !mesh.texcoords.is_empty() {
+                        [
+                            mesh.texcoords[i * 2],
+                            mesh.texcoords[i * 2 + 1],
+                        ]
+                    } else {
+                        [0.0, 0.0]
+                    };
 
-                    vertex_data.push(crate::vert!(pos, [0.0, 0.0], normal));
+                    vertex_data.push(crate::vert!(pos, tex_coords, normal));
+                }
+
+                let current_model = glium::VertexBuffer::new(display, &vertex_data)
+                    .unwrap()
+                    .into();
+
+                vertex_buffer_any_array.push(current_model);
+            }
+
+            for mat in material {
+
+                texture_data.push(super::texture::Texture{
+                    diffuse_texture:   mat.diffuse_texture,
+                    ambient_texture:   mat.ambient_texture,
+                    specular_texture:  mat.specular_texture,
+                    shininess_texture: mat.shininess_texture,
+                    normal_texture:    mat.normal_texture,
+                    dissolve_texture:  mat.dissolve_texture,
+                });
+
+                material_data.push(super::material::Material{
+                    diffuse:         mat.diffuse,
+                    ambient:         mat.ambient,
+                    specular:        mat.specular,
+                    shininess:       mat.shininess,
+                    dissolve:        mat.dissolve,
+                    optical_density: mat.optical_density,
+                });
+            }
+
+            loop{
+                match vertex_buffer_any_array.pop(){
+                    Some(vertex_buffer_any) => {
+                        model_container.push(super::model::Model{
+                            vertex: vertex_buffer_any,
+                            texture: texture_data.pop(),
+                            material: material_data.pop(),
+                        })
+                    }
+                    None => {break;}
                 }
             }
         }
         Err(err) => panic!("error code : {}", err),
     }
 
-
-    glium::vertex::VertexBuffer::new(display, &vertex_data)
-        .unwrap()
-        .into()
+    model_container
 }

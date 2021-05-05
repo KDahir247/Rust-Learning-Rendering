@@ -41,7 +41,7 @@ impl Vertex {
 
 }
 
-/// #Macro for easily handling Vertex creation
+/// # Macro for easily handling Vertex creation
 ///
 /// The macro has two variants, one for populating the vertex with the position and the tex_coords.
 /// The other variant is used to only populate the position of the vertex.
@@ -74,7 +74,6 @@ impl Vertex {
 /// assert!(vertex.has_normal());
 /// ```
 #[macro_export]
-
  macro_rules! vert {
     ($position:expr, $tex_coord : expr, $normal : expr) =>{
         $crate::vertex::Vertex::new($position, $tex_coord, $normal)

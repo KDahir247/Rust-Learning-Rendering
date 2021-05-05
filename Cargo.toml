@@ -10,6 +10,8 @@ glium = "*" # opengl binding
 superluminal-perf = "*" #profile
 image = "*" # image/texture loading
 tobj = "*" # object loading
+glam = "*"
+nalgebra-glm = "*"
 
 [profile.release]
 lto = true

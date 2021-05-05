@@ -10,26 +10,80 @@ fn main() {
     superluminal_perf::begin_event("initialization");
 
     let event_loop = glium::glutin::event_loop::EventLoop::new();
+
     let wb = glium::glutin::window::WindowBuilder::new()
         .with_title("3D Model");
+
     let cb = glium::glutin::ContextBuilder::new()
         .with_double_buffer(Some(true))
         .with_hardware_acceleration(Some(true))
         .with_depth_buffer(24);
+
     let display = glium::Display::new(wb, cb, &event_loop)
         .expect("failed to create opengl display");
 
     superluminal_perf::end_event();
 
-    superluminal_perf::begin_event("getting_model_path");
+    superluminal_perf::begin_event("load_model_data");
 
-    let path=  util::core::get_relative_path_file("model/SRT_Damon/dragon.obj").expect("failed to get relative path");
+    let path=  util::core::get_relative_path_file("./model/RubyRose/untitled.obj")
+        .expect("failed to get relative path");
+
+    let models = util::core::load_wavefront_obj(&display, std::path::Path::new(path.as_str()), false);
 
     superluminal_perf::end_event();
 
-    superluminal_perf::begin_event("loading_model_to_vertex_buffer");
-    //load model
-    let vertex_buffer = util::core::load_wavefront_obj(&display, path.as_str(), false);
+    superluminal_perf::begin_event("load_texture_image");
+
+    let mut diffuse_textures = Vec::new();
+    let mut normal_textures = Vec::new();
+
+    let path = util::core::get_relative_path("./model/RubyRose");
+
+    for index in 0..models.len(){
+
+        let texture = models[index]
+            .texture
+            .as_ref()
+            .unwrap();
+
+        if !texture.diffuse_texture.is_empty() {
+
+            let absolute_diffuse_path =  format!("{}//{}", path, texture.diffuse_texture);
+
+            let texture_path = std::path::Path::new(absolute_diffuse_path.as_str());
+
+            let image = image::open(texture_path)
+                .unwrap()
+                .to_rgba16();
+
+            let image_dimensions = image.dimensions();
+
+            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
+
+            diffuse_textures
+                .push(glium::texture::SrgbTexture2d::new(&display, image).unwrap());
+        }
+
+        if !texture.normal_texture.is_empty(){
+
+            let absolute_normal_path = format!("{}//{}", path, texture.normal_texture);
+
+            let texture_path = std::path::Path::new(absolute_normal_path.as_str());
+
+            let image = image::open(texture_path)
+                .unwrap()
+                .to_rgba16();
+
+            let image_dimensions = image.dimensions();
+
+            let image = glium::texture::RawImage2d::from_raw_rgba_reversed(&image.into_raw(), image_dimensions);
+
+            normal_textures.push(glium::texture::Texture2d::new(&display, image).unwrap());
+        }
+    }
+
+
 
     superluminal_perf::end_event();
 
@@ -55,13 +109,13 @@ fn main() {
     superluminal_perf::end_event();
 
     let matrix = [
-        [0.005, 0.0, 0.0, 0.0],
-        [0.0, 0.005, 0.0, 0.0],
-        [0.0, 0.0, 0.005, 0.0],
-        [0.0, 0.0, 0.0, 1.0f32]
+        [1., 0.0, 0.0, 0.0],
+        [0.0, 1., 0.0, 0.0],
+        [0.0, 0.0, 1., 0.0],
+        [0.0, -1.0, -7.0, 1.0f32]
     ];
 
-    let light = [1.0, 0.4, 0.9f32];
+    let light = [-0.5, -0.4, 0.5f32];
 
     event_loop.run(move |evt, _, control_flow|{
 
@@ -73,6 +127,7 @@ fn main() {
                 write: true,
                 ..Default::default()
             },
+            backface_culling : glium::BackfaceCullingMode::CullClockwise,
 
             ..Default::default()
         };
@@ -82,8 +137,57 @@ fn main() {
         superluminal_perf::begin_event("draw_call");
 
         let mut frame = display.draw();
+
         frame.clear_color_and_depth((0.3, 0.2, 0.1, 1.0), 1.0);
-        frame.draw(&vertex_buffer, &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList), &program,&glium::uniform! {matrix : matrix, u_light: light}, &params).unwrap();
+
+        let aspect_ratio = frame.get_dimensions();
+
+        let perspective = {
+
+            let (width, height) = frame.get_dimensions();
+            let aspect_ratio = width as f32 / height as f32;
+
+            let fov : f32 = std::f32::consts::PI / 3.0; //60 fov
+            let zfar = 1024.0;
+            let znear = 0.1;
+
+            let f = 1.0 / (fov / 2.0).tan();
+
+            let perspective_matrix =  nalgebra_glm::perspective(aspect_ratio, fov,znear,zfar);
+
+            perspective_matrix.data.0
+        };
+
+        let view = {
+            let v = nalgebra_glm::make_vec3(&[0.,0.0, 0.1f32]);
+            let view_matrix = nalgebra_glm::translation(&v);
+
+            [
+                view_matrix.data.0[0],
+                view_matrix.data.0[1],
+                view_matrix.data.0[2],
+                view_matrix.data.0[3]
+            ]
+        };
+        for index in 0..models.len() {
+
+            //some model might not have a diffuse texture, so we clamp the index to the maximum diffuse_textures length - 1
+            let texture_index = util::math::clamp(index as f32, 0., (diffuse_textures.len() - 1) as f32) as usize;
+
+            frame.draw(&models[index].vertex,
+                       &glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList),
+                       &program,
+                       &glium::uniform! {
+                           matrix : matrix,
+                           perspective: perspective,
+                           view: view,
+                           u_light: light,
+                           diffuse_tex: &diffuse_textures[texture_index],
+                           normal_tex : &normal_textures[texture_index]
+                       },
+                       &params)
+                .unwrap();
+        }
         frame.finish();
 
         superluminal_perf::end_event();
