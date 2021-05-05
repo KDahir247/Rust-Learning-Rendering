@@ -33,5 +33,5 @@ Hello_triangle moving (gif quality drop)
 
 <br/>
 
-Loading a 3d model (silhouette, no texture, no shading)
-![me](https://github.com/KDahir247/Rust-Learning-Rendering/blob/main/pic/model.png)
+Loading a 3d model (no texture)
+![me](https://github.com/KDahir247/Rust-Learning-Rendering/blob/main/pic/model_shading.png)
